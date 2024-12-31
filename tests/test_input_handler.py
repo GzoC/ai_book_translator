@@ -5,6 +5,13 @@ import os
 import logging
 from pathlib import Path
 from unittest.mock import patch
+import sys
+
+# Agregar el directorio raíz al PYTHONPATH
+project_root = Path(__file__).parent.parent
+sys.path.append(str(project_root))
+
+from src.config import MAX_FILE_SIZE_MB
 from src.input_handler import verificar_permisos, verificar_tamaño, cargar_documento
 
 class TestInputHandler(unittest.TestCase):

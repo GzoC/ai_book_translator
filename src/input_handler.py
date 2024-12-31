@@ -2,7 +2,7 @@ import os
 import logging
 from pathlib import Path
 from typing import Union
-from config import MAX_FILE_SIZE_MB  # Importa configuración global del proyecto
+from src.config import MAX_FILE_SIZE_MB  # Importa configuración global del proyecto
 
 # Configura el sistema de logging para seguimiento de operaciones
 logging.basicConfig(

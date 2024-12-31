@@ -9,6 +9,8 @@
 # IDIOMA_ORIGEN = "en"
 # IDIOMA_DESTINO = "es"
 
+MAX_FILE_SIZE_MB = 50  # Asegúrate que esta variable está definida
+
 def obtener_configuracion():
     """
     Obtiene la configuración del software.
