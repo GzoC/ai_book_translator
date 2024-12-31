@@ -23,10 +23,13 @@ def cargar_documento(ruta_archivo):
         raise ValueError("Error: Solo se admiten archivos con extensión .pdf.")
     return ruta_archivo
 
-if __name__ == '__main__':
+def main():
     try:
         ruta = input("Introduce la ruta del archivo PDF: ")
         documento_cargado = cargar_documento(ruta)
         print(f"Documento cargado con éxito: {documento_cargado}")
     except (FileNotFoundError, ValueError) as e:
         print(e)
+
+if __name__ == '__main__':
+    main()
