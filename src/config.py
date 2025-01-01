@@ -1,15 +1,13 @@
-# config.py
-# Módulo para manejar la configuración del software (ejemplo básico).
+# src/config.py
+# Configuración global del proyecto
 
-# Aquí podrías definir variables globales para la configuración,
-# como claves de API, idiomas, etc.
+# Configuraciones generales
+MAX_FILE_SIZE_MB = 50
+OCR_LANG = 'spa'  # Idioma español para OCR
 
-# Ejemplo:
-# API_KEY_GOOGLE_TRANSLATE = "TU_CLAVE_AQUI"
-# IDIOMA_ORIGEN = "en"
-# IDIOMA_DESTINO = "es"
-
-MAX_FILE_SIZE_MB = 50  # Asegúrate que esta variable está definida
+# Otras configuraciones
+PDF_OUTPUT_DIR = 'output'
+TEMP_DIR = 'temp'
 
 def obtener_configuracion():
     """
