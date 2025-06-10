@@ -1,0 +1,19 @@
+# Manipulación de PDF
+PyMuPDF>=1.22.5        # Biblioteca fitz para leer y escribir PDFs
+
+# OCR
+pytesseract>=0.3.10    # Envoltorio Python para Tesseract OCR
+
+# Traducción automática
+transformers>=4.30.0   # Hugging Face Transformers para modelos NMT
+tokenizers>=0.15.0     # Dependencia de transformers
+
+# Procesamiento de imágenes
+Pillow>=10.0.0         # Edición de imágenes
+opencv-python>=4.8.0.72  # Opcional, para tareas más avanzadas
+
+# Utilidades
+python-dotenv>=1.0.0   # Carga de variables de entorno (si se requiere)
+
+# Pruebas
+pytest>=7.4.0          # Framework de pruebas unitarias
