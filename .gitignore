@@ -24,3 +24,6 @@ datos_personales/
 
 # Ignorar el archivo claves_api.txt (datos sensibles)
 claves_api.txt
+
+# Ignorar la carpeta de datos
+book-translator/data/
