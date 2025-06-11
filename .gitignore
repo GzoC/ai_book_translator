@@ -28,6 +28,8 @@ claves_api.txt
 
 # Ignorar la carpeta de datos
 book-translator/data/
-data/input
+
 # Ignorar la carpeta de documentos privados
 hidden_files/
+data/input
+data/output
