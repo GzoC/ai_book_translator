@@ -24,9 +24,9 @@ def extract_images_from_pdf(pdf_path, images_dir):
               Cada dict incluye: página, nombre de archivo, bbox (posición en la página).
     """
     # Asegura que la carpeta de imágenes existe
-    os.makedirs(images_dir, exist_ok=True)
-    doc = fitz.open(pdf_path)
-    images_info = []
+    os.makedirs(images_dir, exist_ok=True)   
+    doc = fitz.open(pdf_path)   
+    images_info = []    
 
     for page_num in range(len(doc)):
         page = doc[page_num]
