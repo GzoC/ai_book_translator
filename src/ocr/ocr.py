@@ -6,6 +6,7 @@ Módulo para extraer texto embebido en imágenes de un PDF usando OCR (Tesseract
 
 import fitz                # PyMuPDF para manejo de PDFs
 import pytesseract         # Interfaz Python para Tesseract OCR
+pytesseract.pytesseract.tesseract_cmd = r"D:\tools\Tesseract-OCR\tesseract.exe"
 from PIL import Image      # Pillow para manipulación de imágenes
 import io                  # Para manejar streams de datos binarios
 import json                # Para exportar resultados a JSON
