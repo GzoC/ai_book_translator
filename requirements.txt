@@ -17,3 +17,7 @@ python-dotenv>=1.0.0   # Carga de variables de entorno (si se requiere)
 
 # Pruebas
 pytest>=7.4.0          # Framework de pruebas unitarias
+
+# Barra de progreso
+tqdm>=4.65.0   # Barra de progreso para operaciones largas
+    
