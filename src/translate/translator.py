@@ -28,22 +28,18 @@ def load_translation_pipeline(model_name: str = "Helsinki-NLP/opus-mt-en-es", de
     )
     return translation_pipeline
 
+from tqdm import tqdm   # Importa tqdm para barra de progreso
+
 def batch_translate_texts(texts: List[str], translation_pipeline, batch_size: int = 16) -> List[str]:
     """
-    Traduce una lista de textos usando el pipeline de traducción, en batches para eficiencia.
-
-    Args:
-        texts (List[str]): Lista de textos en inglés.
-        translation_pipeline: pipeline de HuggingFace cargado.
-        batch_size (int): Tamaño del batch para traducción (mayor = más rápido en GPU).
-
-    Returns:
-        List[str]: Lista de textos traducidos al español, en el mismo orden.
+    Traduce una lista de textos usando el pipeline de traducción, en batches para eficiencia,
+    mostrando una barra de progreso.
     """
     translated = []
-    for i in range(0, len(texts), batch_size):
+    total = len(texts)
+    # tqdm muestra una barra de progreso: 'desc' es el título de la barra
+    for i in tqdm(range(0, total, batch_size), desc="Traduciendo", unit="batch"):
         batch = texts[i:i + batch_size]
-        # El pipeline devuelve una lista de dicts con la clave 'translation_text'
         outputs = translation_pipeline(batch)
         translated_batch = [out['translation_text'] for out in outputs]
         translated.extend(translated_batch)
