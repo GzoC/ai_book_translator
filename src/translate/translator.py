@@ -4,7 +4,9 @@ translator.py
 Módulo para traducir textos del inglés al español usando modelos de HuggingFace Transformers.
 """
 
-from transformers import MarianMTModel, MarianTokenizer, pipeline
+from transformers import MarianMTModel, MarianTokenizer
+from transformers.pipelines import pipeline
+
 from typing import List, Dict, Any
 
 def load_translation_pipeline(model_name: str = "Helsinki-NLP/opus-mt-en-es", device: int = -1):
