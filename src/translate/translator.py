@@ -90,8 +90,9 @@ if __name__ == "__main__":
     translation_pipeline = load_translation_pipeline(model_name=args.model, device=args.device)
 
     # Traduce página por página (manteniendo estructura)
-    for page in data.get("pages", []):
-        page['blocks'] = translate_blocks(page['blocks'], translation_pipeline, batch_size=args.batch_size)
+# Traduce página por página (manteniendo estructura)
+for page in tqdm(data.get("pages", []), desc="Páginas", unit="page"):
+    page['blocks'] = translate_blocks(page['blocks'], translation_pipeline, batch_size=args.batch_size)
 
     # Guarda el resultado con los textos traducidos
     with open(args.output, "w", encoding="utf-8") as f:
