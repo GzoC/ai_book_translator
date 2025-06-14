@@ -5,7 +5,7 @@ Módulo para traducir textos del inglés al español usando modelos de HuggingFa
 Incluye lógica para omitir bloques no traductibles (solo símbolos) y copiar tales bloques sin cambio.
 """
 
-from transformers import pipeline
+from transformers.pipelines import pipeline
 from typing import List, Dict, Any
 import re
 
