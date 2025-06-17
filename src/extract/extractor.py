@@ -41,16 +41,16 @@ def extract_text(pdf_path: str) -> dict:
               }
     """
     # Abrir el documento PDF usando PyMuPDF
-    doc = fitz.open(pdf_path)
+    doc: fitz.Document = fitz.open(pdf_path)
     # Inicializar la estructura de resultado con una lista de páginas
     result = {"pages": []}
 
     # Recorrer cada página del documento por índice
     for page_index in range(len(doc)):
         # Obtener el objeto de página actual
-        page = doc[page_index]
+        page: fitz.Page = doc[page_index]
         # Extraer el contenido de la página en formato de diccionario (incluye texto y potencialmente imágenes)
-        page_dict = page.get_text("dict")
+        page_dict = page.get_text("dict")  # type: ignore
         # Preparar la estructura de datos para esta página, incluyendo su número (1-indexado)
         page_data = {"number": page_index + 1, "blocks": []}
 
@@ -116,7 +116,7 @@ def extract_text(pdf_path: str) -> dict:
                 # Si la página no tiene texto ni imágenes (por ejemplo, contenido vectorial), 
                 # renderizar la página completa y aplicar OCR sobre el renderizado.
                 # Renderizar la página a imagen (aumentando la escala para mejorar OCR, e.g., factor 2 para mayor resolución)
-                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))  # type: ignore
                 # Convertir el pixmap a una imagen PIL
                 mode = "RGBA" if pix.alpha else "RGB"
                 image = Image.frombytes(mode, (pix.width, pix.height), pix.samples)
