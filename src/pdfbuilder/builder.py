@@ -50,18 +50,21 @@ def reconstruct_pdf(json_path, pdf_original, pdf_output):
         data = json.load(f)
 
     # Abrir el PDF original en modo lectura
-    doc_original = fitz.open(pdf_original)
+    doc_original: fitz.Document = fitz.open(pdf_original)
     # Crear un nuevo documento PDF vacío
-    doc_nuevo = fitz.open()
+    doc_nuevo: fitz.Document = fitz.open()
 
     # Recorrer cada página de datos (debe coincidir con el PDF original)
     for idx, page_info in enumerate(data.get("pages", [])):
         # Extraer la página original para copiar fondo, imágenes, etc.
-        page_orig = doc_original[idx]
+        page_orig: fitz.Page = doc_original[idx]
         # Crear una nueva página del mismo tamaño en el PDF de salida
-        page = doc_nuevo.new_page(width=page_orig.rect.width, height=page_orig.rect.height)
-        # Copiar el fondo e imágenes de la página original al nuevo PDF
-        pix = page_orig.get_pixmap()
+        page = doc_nuevo.insert_page(idx, width=page_orig.rect.width, height=page_orig.rect.height)
+        # Copiar el fondo e imágenes de la página original al nuevo PDF usando una versión de alta calidad
+        try:
+            pix = page_orig.get_pixmap(matrix=fitz.Matrix(2, 2))
+        except Exception:
+            pix = page_orig._get_pixmap(None, fitz.Matrix(2, 2))
         img = pix.tobytes()
         # Insertar la imagen como fondo de página completa
         page.insert_image(page.rect, stream=img)
@@ -75,8 +78,9 @@ def reconstruct_pdf(json_path, pdf_original, pdf_output):
             # Salta si el bloque traducido está vacío
             if not text.strip():
                 continue
-            # Ajusta la fuente a un estándar del sistema si no existe la original
-            fontname = font if font in fitz.Font(font).family else "Times-Roman"
+            # Usar fuentes estándar del sistema PDF
+            fuentes_estandar = ["Times-Roman", "Helvetica", "Courier", "Symbol", "ZapfDingbats"]
+            fontname = font if font in fuentes_estandar else "Times-Roman"
             # Ajustar el tamaño para que quepa el texto traducido
             ajusted_size = adjust_font_size(page, bbox, text, fontname, size)
             # Tapar el texto original dibujando un rectángulo blanco sobre su bbox
