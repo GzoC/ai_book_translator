@@ -1,5 +1,3 @@
-# pyright: reportUnknownMember=false
-
 """
 builder.py
 
@@ -61,11 +59,8 @@ def reconstruct_pdf(json_path: str, pdf_original_path: str, pdf_output_path: str
         orig_index = page_info["number"] - 1           # Página 0-based
         orig_page = doc_original[orig_index]           # Objeto Page original
 
-        # Crear directamente la nueva página y obtener su objeto Page
-        new_page = doc_new.new_page(                    # Devuelve un Page
-            width=orig_page.rect.width,
-            height=orig_page.rect.height
-        )
+        # Crear página nueva compatible con versiones antiguas
+        new_page = doc_new.new_page(width=orig_page.rect.width, height=orig_page.rect.height)
 
         # Renderizar la página original como imagen para usarla de fondo
         pix = orig_page.get_pixmap()
@@ -85,10 +80,9 @@ def reconstruct_pdf(json_path: str, pdf_original_path: str, pdf_output_path: str
             rect = fitz.Rect(bbox_coords)
 
             # Determinar la fuente a usar, con fallback
+            fuentes_estandar = ["Times-Roman", "Helvetica", "Courier", "Symbol", "ZapfDingbats"]
             fontname = block.get("font", "Times-Roman")
-            try:
-                fitz.Font(fontname)
-            except Exception:
+            if fontname not in fuentes_estandar:
                 fontname = "Times-Roman"
 
             # Ajustar tamaño de fuente
