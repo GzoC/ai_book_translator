@@ -1,3 +1,5 @@
+# pyright: reportUnknownMember=false
+
 """
 builder.py
 
