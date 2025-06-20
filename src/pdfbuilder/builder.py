@@ -1,132 +1,125 @@
 """
 builder.py
 
-Reconstruye un PDF en español a partir del JSON de bloques traducidos y del PDF original,
-preservando el formato visual. Usa PyMuPDF para:
-  - Crear un documento nuevo.
-  - Copiar cada página como imagen de fondo.
-  - Sobreponer el texto traducido en su posición original.
-
-Se agregan tipos y # type: ignore para silenciar advertencias de Pylance.
+Reconstruye un PDF traducido usando el JSON de bloques traducidos y el PDF original.
+El fondo se inserta como imagen PNG RGB para máxima compatibilidad y se sobrepone el texto traducido.
+Ultra-documentado y preparado para evitar páginas en blanco.
 """
 
 import fitz  # PyMuPDF
 import json
 import os
 
-def adjust_font_size(page: fitz.Page, bbox: list, text: str, fontname: str, initial_size: float) -> float:
+
+def adjust_font_size(page, bbox, text, fontname, initial_size):
     """
-    Ajusta el tamaño de fuente para que el texto quepa dentro del bbox.
-    Usa fitz.get_text_length() para medir longitudes.
+    Ajusta el tamaño de la fuente para que el texto traducido quepa dentro del bbox.
 
     Args:
-        page (fitz.Page): Página donde se insertará el texto.
-        bbox (list): [x0, y0, x1, y1] coordenadas del área.
-        text (str): Texto traducido a insertar.
-        fontname (str): Nombre de la fuente a usar.
-        initial_size (float): Tamaño de fuente original.
-
+        page: Objeto página de PyMuPDF.
+        bbox (list): [x0, y0, x1, y1] área destino.
+        text (str): Texto a escribir.
+        fontname (str): Fuente deseada.
+        initial_size (float): Tamaño base.
     Returns:
-        float: Tamaño de fuente ajustado.
+        float: tamaño ajustado.
     """
     max_width = bbox[2] - bbox[0]
     size = initial_size
-    min_size = 5.0
-
-    # Reducir de a 0.5 hasta que el ancho quepa o lleguemos al tamaño mínimo
+    min_size = 5
     while size >= min_size:
-        # fitz.get_text_length mide el ancho del texto con la fuente y tamaño dados
-        width = fitz.get_text_length(text, fontname=fontname, fontsize=size)  # type: ignore
-        if width <= max_width:
+        try:
+            # Mide el ancho del texto para saber si cabe en el ancho del bbox
+            w = fitz.get_text_length(text, fontname=fontname, fontsize=size)  # type: ignore
+        except Exception:
+            w = fitz.get_text_length(text, fontname="Times-Roman", fontsize=size)  # type: ignore
+        if w <= max_width:
             return size
         size -= 0.5
-
     return min_size
 
 
-def reconstruct_pdf(json_path: str, pdf_original: str, pdf_output: str):
+def reconstruct_pdf(json_path, pdf_original, pdf_output):
     """
-    Lee un JSON con bloques traducidos y genera un PDF traducido.
+    Reconstruye el PDF traducido: copia fondo como PNG RGB y coloca textos traducidos.
 
     Args:
-        json_path (str): Ruta al JSON con bloques y traducciones.
-        pdf_original (str): Ruta al PDF original.
-        pdf_output (str): Ruta donde se guardará el PDF traducido.
+        json_path (str): Ruta al JSON con bloques traducidos.
+        pdf_original (str): Ruta al PDF fuente.
+        pdf_output (str): Ruta donde guardar el nuevo PDF.
     """
-    # Carga el JSON traducido
+    # Cargar JSON
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # Abrir el PDF original y crear uno nuevo vacío
-    doc_orig: fitz.Document = fitz.open(pdf_original)  # type: ignore
-    doc_new: fitz.Document = fitz.open()               # type: ignore
+    # Abrir documentos PDF
+    doc_original: fitz.Document = fitz.open(pdf_original)  # type: ignore
+    doc_nuevo: fitz.Document = fitz.open()  # type: ignore
 
-    # Iterar sobre cada página traducida
-    for page_index, page_info in enumerate(data.get("pages", [])):
-        # Cargar página original por índice
-        orig_page: fitz.Page = doc_orig.load_page(page_index)  # type: ignore
-        # Crear nueva página con mismo tamaño
-        new_page: fitz.Page = doc_new.new_page(  # type: ignore
-            width=orig_page.rect.width,
-            height=orig_page.rect.height
-        )
+    # Recorrer todas las páginas
+    for idx, page_info in enumerate(data.get("pages", [])):
+        page_orig: fitz.Page = doc_original[idx]  # type: ignore
 
-        # Renderizar la página original como imagen (pixmap)
-        pix = orig_page.get_pixmap()  # type: ignore
-        img_bytes = pix.tobytes()
-        # Insertar imagen de fondo
-        new_page.insert_image(orig_page.rect, stream=img_bytes)  # type: ignore
+        # Crear nueva página con el mismo tamaño
+        page: fitz.Page = doc_nuevo.new_page(width=page_orig.rect.width, height=page_orig.rect.height)  # type: ignore
 
-        # Sobreponer cada bloque traducido
+        # Renderizar la página original como imagen
+        pix = page_orig.get_pixmap(colorspace=fitz.csRGB)  # type: ignore
+        img_bytes = pix.tobytes("png")  # type: ignore
+
+        # Insertar imagen del fondo
+        page.insert_image(page.rect, stream=img_bytes)  # type: ignore
+
+        # Escribir cada bloque traducido sobre el fondo
         for block in page_info.get("blocks", []):
             text = block.get("translated", "")
             bbox = block.get("bbox", [0, 0, 0, 0])
             font = block.get("font", "Times-Roman")
             size = block.get("size", 12)
 
-            # Si no hay texto, saltar
+            # Saltar si no hay texto traducido
             if not text.strip():
                 continue
 
-            # Validar fuente; si falla, usar Times-Roman
+            # Verificar si la fuente existe, si no usar Times-Roman
             try:
                 fitz.Font(font)  # type: ignore
                 fontname = font
             except Exception:
                 fontname = "Times-Roman"
 
-            # Ajustar tamaño para que quepa
-            adjusted_size = adjust_font_size(new_page, bbox, text, fontname, size)
+            # Ajustar tamaño de fuente
+            ajusted_size = adjust_font_size(page, bbox, text, fontname, size)
 
-            # Cubrir texto original
-            new_page.draw_rect(bbox, color=(1, 1, 1), fill=(1, 1, 1))  # type: ignore
+            # Cubrir el texto original con un rectángulo blanco
+            page.draw_rect(bbox, color=(1, 1, 1), fill=(1, 1, 1))  # type: ignore
+
             # Insertar texto traducido
-            new_page.insert_textbox(  # type: ignore
-                bbox,
-                text,
+            page.insert_textbox( # type: ignore
+                bbox, text,
                 fontname=fontname,
-                fontsize=adjusted_size,
+                fontsize=ajusted_size,
                 color=(0, 0, 0),
                 align=fitz.TEXT_ALIGN_LEFT,
                 overlay=True
-            )
+            )  
 
-    # Asegurar carpeta de salida
+    # Guardar el nuevo PDF
     os.makedirs(os.path.dirname(pdf_output), exist_ok=True)
-    # Guardar y cerrar
-    doc_new.save(pdf_output)
-    doc_new.close()
-    doc_orig.close()
-    print(f"Reconstrucción completada. PDF guardado en: {pdf_output}")
+    doc_nuevo.save(pdf_output)
+    doc_nuevo.close()
+    doc_original.close()
+
+    print(f"Reconstrucción completada. PDF traducido guardado en: {pdf_output}")
 
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Reconstruye un PDF traducido a partir de un JSON y del PDF original."
+        description="Reconstruye un PDF traducido usando JSON y PDF original."
     )
-    parser.add_argument("--json", "-j", required=True, help="Ruta al JSON con traducciones.")
+    parser.add_argument("--json", "-j", required=True, help="Ruta al JSON de bloques traducidos.")
     parser.add_argument("--original", "-i", required=True, help="Ruta al PDF original.")
     parser.add_argument("--output", "-o", required=True, help="Ruta para el PDF traducido.")
     args = parser.parse_args()
