@@ -29,11 +29,11 @@ def adjust_font_size(page, bbox, text, fontname, initial_size):
     size = initial_size
     min_size = 5
     while size >= min_size:
+        # Mide ancho del texto sin usar métodos de página (uso fitz.get_text_length)
         try:
-            # Mide ancho del texto para saber si cabe en el ancho del bbox
-            width = page.get_text_length(text, fontname=fontname, fontsize=size)  # type: ignore
+            width = fitz.get_text_length(text, fontname=fontname, fontsize=size)  # type: ignore
         except Exception:
-            width = page.get_text_length(text, fontname="Times-Roman", fontsize=size)  # type: ignore
+            width = fitz.get_text_length(text, fontname="Times-Roman", fontsize=size)  # type: ignore
         if width <= max_width:
             return size
         size -= 0.5
