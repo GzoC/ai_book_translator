@@ -16,4 +16,6 @@ technical-review = "technical_review.cli:main"
 include = ["technical_review*"]
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
 markers = ["ocr: requires real Tesseract binary"]
