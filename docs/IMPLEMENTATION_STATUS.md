@@ -1,3 +1,20 @@
+# Actualización vigente — 30 de octubre de 2026
+
+PR #2 sigue BORRADOR, sin autorización de merge. Se retoma desde ad207dd0, cuya CI 40986024742 y 40986019289 está aprobada. Este encabezado reemplaza los pendientes históricos equivalentes que se conservan debajo.
+
+- Corregido el encabezado del PDF: texto español completo en lugar de flecha dependiente de Symbol. Regenerado desde el JSON de inferencia real existente, SIN repetir modelo ni atribuir nuevas mediciones. var/real-digital-font-fix/review.pdf y var/renders/review-digital-font-fix.png inspeccionados: encabezado y contenido legibles, sin omisión visual observada en esta página. Poppler aún emite advertencia global sobre fuente Symbol; no afirmar que la advertencia desapareció. Conservados PDF/render originales del fallo.
+- Ruff y 15 pruebas locales aprobados; 1 OCR omitida porque Tesseract sigue ausente localmente. OCR real ya probado en CI histórica, no se repitió localmente.
+- Wheel/sdist construidos. Wheel instalado con dependencias base en ../wheel-smoke-20261030, fuera del checkout. Desde ese directorio, python -I cargó technical_review de site-packages; CLI --help exit 0, extracción del fixture digital produjo 3 bloques y build_review generó una página usando el JSON previo. No se instaló ni ejecutó el modelo en ese entorno. Evidencia var/wheel-smoke-20261030.json y PDF installed-wheel-review.pdf.
+- CI ampliada con instalación wheel en directorio temporal, imports aislados y CLI --help. Comprobar CI del nuevo HEAD al reanudar; no declarar aprobado este paso remoto hasta observarlo.
+
+Pendientes actuales: mediciones reproducibles de cobertura/omisiones/QA/overflow/tiempo/recursos, más inferencia real y revisión de fixtures, pruebas adicionales de CLI errores/directorios/glosario, ejemplos antes/después y cierre de README/documentación/licencias. Revisar distribución sdist: contiene tests que importan scripts, pero scripts/fixtures no aparecen en el archivo generado; decidir incluirlos o excluir tests del sdist y documentar pruebas desde checkout. Verificar CI final y completar revisión antes de marcar PR listo. No repetir corrección del encabezado ni instalación aislada ya comprobadas.
+
+Cuota al iniciar: 99% primaria / 10% semanal. Última comprobada antes de respaldo: 96% primaria / 9% semanal. Reservar margen para backup y detener implementación con <=8%. No créditos de restauración. Sin procesos de modelo abiertos. Skill PDF marker ya registrado, no repetir. No tocar 8503. Mismos límites de aprobación y preservación del historial descritos debajo.
+
+---
+
+## Historial del checkpoint anterior (pendientes cerrados arriba no deben repetirse)
+
 # Checkpoint de implementación — 29 de octubre de 2026
 
 Proyecto activo: ai_book_translator. Checkout C:/Users/gzola/Documents/Codex/2026-10-29/portfolio-translator/ai_book_translator. Rama codex/technical-document-review, base abc4089b4a346c152c5445caa0ff78111465a825. PR #2 BORRADOR: https://github.com/GzoC/ai_book_translator/pull/2. No autorización de merge para este PR. Implementación parcial; no entregar como terminada.

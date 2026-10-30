@@ -26,7 +26,7 @@ def build_review(data, path):
     story = [
         Paragraph("Traducción técnica para revisión", styles["Title"]),
         Paragraph(
-            "Borrador EN → ES. Verificar contra el original antes de uso operativo.",
+            "Borrador de inglés a español. Verificar contra el original antes de uso operativo.",
             styles["BodyText"],
         ),
         Spacer(1, 12),
