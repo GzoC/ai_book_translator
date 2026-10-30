@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "technical-document-review"
+version = "0.1.0"
+description = "Local English-Spanish PDF translation with traceable technical review"
+requires-python = ">=3.11,<3.14"
+dependencies = ["PyMuPDF>=1.26,<1.27", "reportlab>=4.4,<5", "pytesseract>=0.3.13,<0.4", "Pillow>=11,<13"]
+[project.optional-dependencies]
+model = ["transformers>=4.57,<5", "torch>=2.6,<3", "sentencepiece>=0.2,<0.3", "sacremoses>=0.1,<0.2"]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+[project.scripts]
+technical-review = "technical_review.cli:main"
+[tool.setuptools.packages.find]
+include = ["technical_review*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["ocr: requires real Tesseract binary"]

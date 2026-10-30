@@ -1,168 +1,21 @@
+# Revisión de documentos técnicos EN → ES
 
-````markdown
-# 📚 PDF Book Translator (English → Spanish)  
-**Traduce libros completos en PDF del inglés al español preservando estructura, formato y contenido visual original, incluso texto en imágenes.**
+Reconstrucción en curso de `ai_book_translator`. El alcance pasa de una promesa de libros idénticos a una salida bilingüe trazable para revisión técnica: fichas y manuales cortos, con original preservado y QA de números, unidades y glosario.
 
----
-
-## 🧠 Descripción
-
-**PDF Book Translator** es una aplicación de código abierto que automatiza la traducción de libros completos en formato PDF. A diferencia de herramientas comunes que solo traducen texto plano, este proyecto:
-
-- Conserva **formato, diseño y maquetación** del documento original.
-- Traduce **texto digital y texto embebido en imágenes** (diagramas, gráficos, dibujos).
-- Genera un nuevo PDF **idéntico al original visualmente**, pero traducido al español.
-
----
-
-## 🎯 Objetivos
-
-- Ofrecer una solución gratuita, sin necesidad de servicios de pago ni APIs comerciales.
-- Traducir libros completos con un solo clic, sin alterar el contenido visual original.
-- Aprender e integrar herramientas modernas de procesamiento de lenguaje natural (NLP), manipulación de PDF y OCR.
-
----
-
-## 🧩 Tecnologías utilizadas
-
-| Funcionalidad            | Herramienta / Librería         |
-|--------------------------|-------------------------------|
-| Manipulación de PDF      | [PyMuPDF (fitz)](https://pymupdf.readthedocs.io/en/latest/) |
-| OCR para imágenes        | [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) + [pytesseract](https://pypi.org/project/pytesseract/) |
-| Traducción automática    | [Hugging Face Transformers](https://huggingface.co/transformers/) + modelo [opus-mt-en-es](https://huggingface.co/Helsinki-NLP/opus-mt-en-es) |
-| Procesamiento de imágenes| [Pillow (PIL)](https://python-pillow.org/) / [OpenCV](https://opencv.org/) |
-| Pruebas                  | [pytest](https://docs.pytest.org/) |
-| Otros                    | Python logging, Git, GitHub |
-
----
-
-## 🗂️ Estructura del proyecto
+**Checkpoint de implementación: todavía no es una entrega validada del motor real.** Consulte [estado](docs/IMPLEMENTATION_STATUS.md). El código original permanece en [legacy/original](legacy/original).
 
 ```bash
-book-translator/
-├── src/
-│   ├── ocr/              # OCR y procesamiento de imágenes
-│   ├── extract/          # Extracción de texto estructurado del PDF
-│   ├── translate/        # Traducción automática (modelo HuggingFace)
-│   ├── pdfbuilder/       # Reconstrucción de PDF traducido
-│   ├── utils/            # Funciones auxiliares
-│   └── main.py           # Script principal (pipeline completo)
-│
-├── tests/                # Pruebas unitarias por módulo
-├── data/                 # PDFs de entrada/salida (no versionados)
-├── requirements.txt      # Lista de dependencias
-├── README.md             # Documentación general del proyecto
-├── .gitignore            # Archivos ignorados por Git
-└── LICENSE               # Licencia de uso
-````
-
----
-
-## ⚙️ Instalación
-
-> ⚠️ Requisitos: Python 3.10+, Tesseract OCR instalado en el sistema.
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/TU_USUARIO/book-translator.git
-cd book-translator
+uv sync --locked --extra dev
+uv run pytest
+# Para el motor local (descarga de dependencias y pesos públicos):
+uv sync --locked --extra dev --extra model
+uv run technical-review examples/fixtures/digital.pdf --output-dir var/example-review --download-model
 ```
 
-### 2. Crear entorno virtual
+El modo predeterminado `--ocr off` marca imágenes como regiones sin OCR. `--ocr images` requiere Tesseract y datos `eng`; también procesa imágenes en páginas con texto digital. `TESSERACT_CMD` permite configurar la ruta sin rutas personales incrustadas. El glosario es una comprobación de terminología, no una garantía de traducción forzada. Tablas y ecuaciones detectadas se preservan para revisar; no se afirma detección exhaustiva.
 
-```bash
-python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
-```
+Salida: `original.pdf` intacto, `review.pdf` recompuesto y `review.json` con página, bloque, caja, origen, motor y banderas. La salida exige revisión humana y no conserva la maquetación original. La ausencia de banderas no acredita exactitud semántica. Se rechazan documentos cifrados, páginas rotadas y más de 50 páginas en este alcance inicial.
 
-### 3. Instalar dependencias
+Modelo: [Helsinki-NLP/opus-mt-en-es](https://huggingface.co/Helsinki-NLP/opus-mt-en-es), revisión `5bc4493d463cf000c1f0b50f8d56886a392ed4ab`. Los documentos no se envían a servicios de traducción. Los pesos se descargan solo al permitirlo; las siguientes ejecuciones usan caché local. La traducción usa fragmentos acotados por tokens y detecta agotamiento del límite de salida.
 
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Instalar Tesseract OCR
-
-#### Linux (Ubuntu/Debian)
-
-```bash
-sudo apt update
-sudo apt install tesseract-ocr
-```
-
-#### Windows
-
-Descargar el instalador desde:
-[https://github.com/tesseract-ocr/tesseract/wiki](https://github.com/tesseract-ocr/tesseract/wiki)
-Asegúrate de agregar la ruta de instalación a las variables de entorno (`PATH`).
-
-#### macOS
-
-```bash
-brew install tesseract
-```
-
----
-
-## 🚀 Uso
-
-1. Coloca tu PDF en la carpeta `data/input/`.
-2. Ejecuta el pipeline completo:
-
-```bash
-python src/main.py --input data/input/book.pdf --output data/output/book_translated.pdf
-```
-
-3. El PDF traducido estará disponible en `data/output/`.
-
-> El sistema traducirá automáticamente todos los textos detectados (tanto digitales como en imágenes) manteniendo el diseño original del libro.
-
----
-
-## ✅ Estado del desarrollo
-
-* [x] Planificación y estructura del proyecto
-* [ ] Módulo de extracción de texto digital
-* [ ] Módulo de OCR para imágenes
-* [ ] Módulo de traducción
-* [ ] Módulo de reconstrucción del PDF
-* [ ] Pruebas unitarias e integración
-* [ ] Interfaz CLI/GUI
-* [ ] Documentación completa y empaquetado
-
----
-
-## 👨‍💻 Contribuir
-
-Si deseas colaborar:
-
-1. Haz un fork del repositorio.
-2. Crea una rama para tu funcionalidad: `git checkout -b feature/nombre-funcionalidad`
-3. Realiza tus cambios y haz commit: `git commit -m "Agrega nueva funcionalidad"`
-4. Push a tu rama: `git push origin feature/nombre-funcionalidad`
-5. Crea un Pull Request describiendo los cambios.
-
----
-
-## 🪪 Licencia
-
-Este proyecto está licenciado bajo la **Licencia MIT**.
-Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
-## 🙋‍♂️ Autor
-
-Proyecto desarrollado por **Gonzalo Cisterna Salinas**
-📧 Contacto: [cisternasalinasg@gmail.com](mailto:cisternasalinasg@gmail.com)
-🔗 GitHub: [github.com/GzoC](https://github.com/GzoC)
-
----
-
-## 📌 Nota final
-
-Este proyecto está pensado tanto como herramienta útil para lectores, traductores y creadores de contenido, como también una plataforma educativa para aprender tecnologías modernas de IA, procesamiento de texto y automatización de documentos.
-Cada módulo estará completamente documentado, comentado y explicado paso a paso para facilitar el aprendizaje progresivo.
-
-```
+Código original MIT preservado. Las dependencias tienen sus propias licencias; PyMuPDF se distribuye bajo AGPL/comercial y el modelo indica Apache-2.0. Revisar sus condiciones antes de redistribuir una aplicación. Los fixtures son documentos sintéticos propios, no manuales de terceros.
