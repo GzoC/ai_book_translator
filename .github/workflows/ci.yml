@@ -1,0 +1,30 @@
+name: Technical PDF review
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.11.19'
+          python-version: ${{ matrix.python }}
+      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng poppler-utils
+      - run: uv sync --locked --extra dev
+      - run: uv run --no-sync ruff check technical_review tests scripts
+      - run: uv run --no-sync ruff format --check technical_review tests scripts
+      - run: uv run --no-sync pytest -q
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: technical-review-${{ matrix.python }}
+          path: dist/
