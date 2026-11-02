@@ -1,4 +1,5 @@
 import hashlib
+import os
 import shutil
 
 import pymupdf as fitz
@@ -8,7 +9,7 @@ from scripts.make_fixtures import create_fixtures
 from technical_review.build import build_review
 from technical_review.extract import extract
 from technical_review.quality import check_translation, validate_bbox
-from technical_review.translate import translate_document
+from technical_review.translate import MarianTranslator, translate_document
 
 
 @pytest.fixture(scope="session")
@@ -150,7 +151,8 @@ def test_source_is_unchanged(fixtures, tmp_path):
 
 @pytest.mark.ocr
 @pytest.mark.skipif(
-    shutil.which("tesseract") is None, reason="Real Tesseract executable unavailable"
+    shutil.which(os.environ.get("TESSERACT_CMD", "tesseract")) is None,
+    reason="Real Tesseract executable unavailable",
 )
 def test_real_ocr_scanned_and_mixed(fixtures):
     for name in ("scanned", "mixed"):
@@ -158,3 +160,26 @@ def test_real_ocr_scanned_and_mixed(fixtures):
         text = " ".join(b["text"] for p in data["pages"] for b in p["blocks"])
         assert "24 V" in text and "10 bar" in text
         assert any(b["origin"] == "ocr" for p in data["pages"] for b in p["blocks"])
+
+
+def test_translate_separates_complete_records_but_keeps_wrapped_prose():
+    class Probe(MarianTranslator):
+        def __init__(self):
+            self.calls = []
+
+        def _translate_record(self, text):
+            self.calls.append(text)
+            return " ".join(text.split())
+
+    probe = Probe()
+    result = probe.translate(
+        "Inspect the\npressure sensor.\nRecord 2: check the cable."
+    )
+    assert probe.calls == [
+        "Inspect the\npressure sensor.",
+        "Record 2: check the cable.",
+    ]
+    assert result.splitlines() == [
+        "Inspect the pressure sensor.",
+        "Record 2: check the cable.",
+    ]

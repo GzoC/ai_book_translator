@@ -23,6 +23,14 @@ def describe_flag(flag, glossary):
     }.get(flag, flag)
 
 
+STATUS_LABELS = {
+    "draft": "Borrador",
+    "needs_review": "Revisar",
+    "preserved_for_review": "Original conservado",
+    "preserved_after_error": "Revisar original",
+}
+
+
 def build_review(data, path):
     """Reflowed bilingual review, never paints over source content."""
     path = Path(path)
@@ -66,7 +74,11 @@ def build_review(data, path):
             story.append(
                 Paragraph(
                     escape(
-                        block["id"] + " · " + block["origin"] + " · " + block["status"]
+                        block["id"]
+                        + " · "
+                        + ("OCR" if block["origin"] == "ocr" else "Texto digital")
+                        + " · "
+                        + STATUS_LABELS[block["status"]]
                     ),
                     styles["Heading3"],
                 )

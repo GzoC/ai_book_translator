@@ -84,7 +84,11 @@ def extract(path, ocr="off"):
             blocks = []
             warnings = []
             tables = [fitz.Rect(t.bbox) for t in page.find_tables().tables]
-            for item in page.get_text("dict", sort=True)["blocks"]:
+            for item in page.get_text(
+                "dict",
+                sort=True,
+                flags=fitz.TEXTFLAGS_DICT & ~fitz.TEXT_PRESERVE_IMAGES,
+            )["blocks"]:
                 if item["type"] != 0:
                     continue
                 text = "\n".join(
@@ -94,18 +98,13 @@ def extract(path, ocr="off"):
                 if not text:
                     continue
                 box = fitz.Rect(item["bbox"])
-                flags = []
-                if any((box & t).get_area() > 0 for t in tables):
-                    flags.append("table_preserved")
-                if any(c in text for c in ("=", "∫", "∑", "√")):
-                    flags.append("equation_preserved")
                 blocks.append(
                     {
                         "text": text,
                         "bbox": list(box),
                         "origin": "digital",
                         "confidence": None,
-                        "flags": flags,
+                        "flags": [],
                     }
                 )
             regions = []
@@ -141,6 +140,13 @@ def extract(path, ocr="off"):
                         blocks.append(block)
             blocks.sort(key=lambda b: (round(b["bbox"][1], 1), b["bbox"][0]))
             for index, block in enumerate(blocks, 1):
+                if any(
+                    (fitz.Rect(block["bbox"]) & table).get_area() > 0
+                    for table in tables
+                ):
+                    block["flags"].append("table_preserved")
+                if any(c in block["text"] for c in ("=", "∫", "∑", "√")):
+                    block["flags"].append("equation_preserved")
                 block["id"] = f"p{page.number + 1:03d}-b{index:03d}"
                 block["bbox"] = validate_bbox(
                     block["bbox"], bounds.width, bounds.height

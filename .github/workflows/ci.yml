@@ -33,6 +33,14 @@ jobs:
           cd "$smoke_dir"
           env/bin/python -I -c "import technical_review.cli, technical_review.build, technical_review.extract"
           env/bin/technical-review --help
+      - name: Run tests from the source distribution
+        shell: bash
+        run: |
+          source_dir=$(mktemp -d)
+          tar -xf dist/*.tar.gz -C "$source_dir"
+          cd "$source_dir"/technical_document_review-*
+          uv sync --locked --extra dev
+          uv run --no-sync pytest -q
       - uses: actions/upload-artifact@v4
         with:
           name: technical-review-${{ matrix.python }}

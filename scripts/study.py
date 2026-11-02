@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 import platform
 import time
 from collections import Counter
@@ -122,9 +123,28 @@ def tokens(blocks, pattern):
     return dict(counts)
 
 
+def record_alignment(blocks):
+    total = matched = 0
+    for block in blocks:
+        source = block["text"].splitlines()
+        target = (
+            block["translated"].splitlines()
+            if not block["status"].startswith("preserved")
+            else []
+        )
+        total += len(source)
+        matched += sum(
+            bool(NUMBER.findall(a)) and NUMBER.findall(a) == NUMBER.findall(b)
+            for a, b in zip(source, target)
+        )
+    return {"source_records": total, "matching_ids_in_position": matched}
+
+
 def run_study(output):
     output.mkdir(parents=True, exist_ok=False)
     fixtures = Path(__file__).resolve().parents[1] / "examples/fixtures"
+    if command := os.environ.get("TESSERACT_CMD"):
+        pytesseract.pytesseract.tesseract_cmd = command
     proc = psutil.Process()
     peak = proc.memory_info().rss
     done = Event()
@@ -184,6 +204,8 @@ def run_study(output):
                 "process_cpu_seconds": round(cpu, 3),
                 "review_pdf_bytes": (target / "review.pdf").stat().st_size,
             }
+            if name == "long":
+                result["record_alignment"] = record_alignment(blocks)
             study["fixtures"][name] = result
             print(name, result["metrics"], result["pdf"], flush=True)
         study["sampled_peak_parent_rss_mib"] = round(peak / 2**20, 1)

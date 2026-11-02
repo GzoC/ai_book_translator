@@ -1,3 +1,5 @@
+import re
+
 from .quality import GLOSSARY, check_translation
 
 MODEL_ID = "Helsinki-NLP/opus-mt-en-es"
@@ -22,6 +24,12 @@ class MarianTranslator:
         self.model.eval()
 
     def translate(self, text):
+        # PDF line breaks often just wrap prose. Keep a boundary only after
+        # terminal punctuation, so finished log entries do not collapse together.
+        records = re.split(r"(?<=[.!?])[^\S\n]*\n+", text.strip())
+        return "\n".join(self._translate_record(record) for record in records)
+
+    def _translate_record(self, text):
         # Token-aware chunks; never set truncation=True or silently discard source tokens.
         words = text.split()
         chunks = []

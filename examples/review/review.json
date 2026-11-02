@@ -1,0 +1,138 @@
+{
+  "source_name": "mixed.pdf",
+  "source_sha256": "07a0b9876c7369ef5601c750392430682d9f0699fd02f50983b517ad6dcebae6",
+  "ocr_mode": "images",
+  "pages": [
+    {
+      "number": 1,
+      "width": 612.0,
+      "height": 792.0,
+      "blocks": [
+        {
+          "text": "Power supply specification",
+          "bbox": [
+            48.0,
+            42.650001525878906,
+            260.07598876953125,
+            67.38200378417969
+          ],
+          "origin": "digital",
+          "confidence": null,
+          "flags": [],
+          "id": "p001-b001",
+          "translated": "Especificación de la fuente de alimentación",
+          "status": "draft"
+        },
+        {
+          "text": "Rated voltage: 24 V. Rated current: 5 A.",
+          "bbox": [
+            48.0,
+            84.0999984741211,
+            260.7839660644531,
+            100.58799743652344
+          ],
+          "origin": "digital",
+          "confidence": null,
+          "flags": [],
+          "id": "p001-b002",
+          "translated": "Tensión nominal: 24 V. Corriente nominal: 5 A.",
+          "status": "draft"
+        },
+        {
+          "text": "Inspect the circuit breaker before maintenance.",
+          "bbox": [
+            48.0,
+            109.0999984741211,
+            298.1159362792969,
+            125.58799743652344
+          ],
+          "origin": "digital",
+          "confidence": null,
+          "flags": [
+            "glossary:circuit breaker"
+          ],
+          "id": "p001-b003",
+          "translated": "Inspeccione el interruptor antes del mantenimiento.",
+          "status": "needs_review"
+        },
+        {
+          "text": "Pressure sensor",
+          "bbox": [
+            64.33333333333333,
+            246.33333333333334,
+            174.66666666666666,
+            256.6666666666667
+          ],
+          "origin": "ocr",
+          "confidence": 96.0,
+          "flags": [
+            "ocr_review"
+          ],
+          "id": "p001-b004",
+          "translated": "Sensor de presión",
+          "status": "needs_review"
+        },
+        {
+          "text": "Rated voltage: 24 V",
+          "bbox": [
+            64.33333333333333,
+            276.0,
+            202.0,
+            289.6666666666667
+          ],
+          "origin": "ocr",
+          "confidence": 92.0,
+          "flags": [
+            "ocr_review"
+          ],
+          "id": "p001-b005",
+          "translated": "Tensión nominal: 24 V",
+          "status": "needs_review"
+        },
+        {
+          "text": "Measuring range: 0 to 10 bar",
+          "bbox": [
+            64.33333333333333,
+            306.0,
+            268.0,
+            319.66666666666663
+          ],
+          "origin": "ocr",
+          "confidence": 93.0,
+          "flags": [
+            "ocr_review"
+          ],
+          "id": "p001-b006",
+          "translated": "Rango de medición: 0 a 10 bar",
+          "status": "needs_review"
+        }
+      ],
+      "warnings": []
+    }
+  ],
+  "engine": {
+    "name": "Helsinki-NLP/opus-mt-en-es",
+    "revision": "5bc4493d463cf000c1f0b50f8d56886a392ed4ab"
+  },
+  "glossary": {
+    "circuit breaker": "interruptor automático",
+    "pressure sensor": "sensor de presión",
+    "rated voltage": "tensión nominal",
+    "power supply": "fuente de alimentación"
+  },
+  "metrics": {
+    "extracted_blocks": 6,
+    "translated_blocks": 6,
+    "preserved_blocks": 0,
+    "flagged_blocks": 4,
+    "unprocessed_regions": 0,
+    "human_review_required": true,
+    "translation_and_qa_seconds": 1.726,
+    "elapsed_seconds": 1.945
+  },
+  "layout": {
+    "review_pages": 1,
+    "layout": "reflowed_bilingual",
+    "source_overlay": false
+  }
+}

@@ -1,3 +1,5 @@
-include scripts/__init__.py scripts/make_fixtures.py
-recursive-include examples/fixtures *.pdf
-include tests/test_review.py tests/test_cli.py
+include uv.lock requirements.txt
+recursive-include scripts *.py
+recursive-include tests *.py
+recursive-include examples *.pdf *.json *.png
+recursive-include docs *.md *.json

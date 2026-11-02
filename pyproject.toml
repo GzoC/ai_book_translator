@@ -5,6 +5,8 @@ build-backend = "setuptools.build_meta"
 name = "technical-document-review"
 version = "0.1.0"
 description = "Local English-Spanish PDF translation with traceable technical review"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.11,<3.14"
 dependencies = ["PyMuPDF>=1.26,<1.27", "reportlab>=4.4,<5", "pytesseract>=0.3.13,<0.4", "Pillow>=11,<13"]
 [project.optional-dependencies]
