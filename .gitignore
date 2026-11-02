@@ -1,36 +1,12 @@
-# Archivos comunes de Python
+.venv/
 __pycache__/
 *.pyc
-*.pyo
-
-# Archivos de entorno
+.ruff_cache/
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+var/
 .env
-.env.local
-venv/
-
-# Archivos de ReportLab
-temp_image.png
-
-# Archivos IDE
-*.idea
-*.vscode
-*.pyc
-
-# Archivos de sistema operativo
-.DS_Store
-Thumbs.db
-
-# Ignorar la carpeta de datos personales y sus contenidos
-datos_personales/
-
-# Ignorar el archivo claves_api.txt (datos sensibles)
-claves_api.txt
-
-# Ignorar la carpeta de datos
-book-translator/data/
-
-# Ignorar la carpeta de documentos privados
-hidden_files/
-data/input
-data/output
-data/images
+.env.*
+models/

@@ -1,0 +1,5 @@
+include uv.lock requirements.txt
+recursive-include scripts *.py
+recursive-include tests *.py
+recursive-include examples *.pdf *.json *.png
+recursive-include docs *.md *.json
