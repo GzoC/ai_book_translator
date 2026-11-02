@@ -1,0 +1,3 @@
+include scripts/__init__.py scripts/make_fixtures.py
+recursive-include examples/fixtures *.pdf
+include tests/test_review.py tests/test_cli.py

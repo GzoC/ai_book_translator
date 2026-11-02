@@ -9,6 +9,20 @@ from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer
 from .quality import validate_bbox
 
 
+def describe_flag(flag, glossary):
+    if flag.startswith("glossary:"):
+        term = flag.removeprefix("glossary:")
+        return f"{term} (término esperado: {glossary.get(term, term)})"
+    return {
+        "ocr_review": "Cotejar el texto reconocido con la imagen original",
+        "table_preserved": "Verificar filas y columnas en el original",
+        "equation_preserved": "Comprobar la ecuación en el original",
+        "number_mismatch": "Comprobar los valores numéricos",
+        "unit_mismatch": "Comprobar las unidades",
+        "quantity_pair_mismatch": "Comprobar qué unidad acompaña a cada valor",
+    }.get(flag, flag)
+
+
 def build_review(data, path):
     """Reflowed bilingual review, never paints over source content."""
     path = Path(path)
@@ -63,17 +77,30 @@ def build_review(data, path):
                     styles["BodyText"],
                 )
             )
-            story.append(Spacer(1, 5))
-            story.append(
-                Paragraph(
-                    "ES: " + escape(block["translated"]).replace("\n", "<br/>"),
-                    styles["Target"],
+            if not block["status"].startswith("preserved"):
+                story.append(Spacer(1, 5))
+                story.append(
+                    Paragraph(
+                        "ES: " + escape(block["translated"]).replace("\n", "<br/>"),
+                        styles["Target"],
+                    )
                 )
-            )
+            else:
+                story.append(
+                    Paragraph(
+                        "Texto original conservado para revisión.", styles["BodyText"]
+                    )
+                )
             if block["flags"]:
                 story.append(
                     Paragraph(
-                        "Revisar: " + escape("; ".join(block["flags"])),
+                        "Revisar: "
+                        + escape(
+                            " · ".join(
+                                describe_flag(flag, data.get("glossary", {}))
+                                for flag in block["flags"]
+                            )
+                        ),
                         styles["BodyText"],
                     )
                 )

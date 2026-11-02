@@ -92,6 +92,7 @@ def test_quality_checks_numbers_units_and_glossary():
     assert "glossary:circuit breaker" in check_translation(
         "circuit breaker", "circuito"
     )
+    assert "quantity_pair_mismatch" in check_translation("24 V, 5 A", "24 A, 5 V")
     assert "empty_translation" in check_translation("test", "")
 
 

@@ -1,4 +1,4 @@
-from .quality import check_translation
+from .quality import GLOSSARY, check_translation
 
 MODEL_ID = "Helsinki-NLP/opus-mt-en-es"
 MODEL_REVISION = "5bc4493d463cf000c1f0b50f8d56886a392ed4ab"
@@ -44,7 +44,11 @@ class MarianTranslator:
             inputs = self.tokenizer(chunk, return_tensors="pt", truncation=False)
             with self.torch.inference_mode():
                 result = self.model.generate(
-                    **inputs, max_new_tokens=512, num_beams=4, do_sample=False
+                    **inputs,
+                    max_new_tokens=511,
+                    forced_eos_token_id=None,
+                    num_beams=4,
+                    do_sample=False,
                 )
             if result[0, -1].item() != self.tokenizer.eos_token_id:
                 raise RuntimeError(
@@ -56,6 +60,7 @@ class MarianTranslator:
 
 def translate_document(data, provider, glossary=None):
     data["engine"] = {"name": provider.name, "revision": provider.revision}
+    data["glossary"] = GLOSSARY.copy() if glossary is None else dict(glossary)
     total = translated = preserved = flagged = 0
     for page in data["pages"]:
         for block in page["blocks"]:
@@ -69,6 +74,8 @@ def translate_document(data, provider, glossary=None):
             else:
                 try:
                     target = provider.translate(block["text"])
+                    if not target.strip():
+                        raise ValueError("empty_translation")
                     flags = check_translation(block["text"], target, glossary)
                     block["translated"] = target
                     block["flags"].extend(flags)

@@ -6,6 +6,7 @@ NUMBER = re.compile(r"(?<![\w])[-+]?\d+(?:[.,]\d+)*(?:[eE][-+]?\d+)?")
 UNIT = re.compile(
     r"(?<![A-Za-z])(?:kWh|kW|kV|mA|Hz|bar|MPa|Pa|mm|cm|rpm|Nm|ms|°C|V|A|W|m|s|%)(?![A-Za-z])"
 )
+QUANTITY = re.compile(f"({NUMBER.pattern})\\s*({UNIT.pattern})")
 GLOSSARY = {
     "circuit breaker": "interruptor automático",
     "pressure sensor": "sensor de presión",
@@ -33,6 +34,10 @@ def check_translation(source, target, glossary=None):
         flags.append("number_mismatch")
     if Counter(UNIT.findall(source)) != Counter(UNIT.findall(target)):
         flags.append("unit_mismatch")
+    if not {"number_mismatch", "unit_mismatch"}.intersection(flags) and (
+        Counter(QUANTITY.findall(source)) != Counter(QUANTITY.findall(target))
+    ):
+        flags.append("quantity_pair_mismatch")
     for term, preferred in (GLOSSARY if glossary is None else glossary).items():
         if re.search(
             r"\b" + re.escape(term) + r"\b", source, re.IGNORECASE
